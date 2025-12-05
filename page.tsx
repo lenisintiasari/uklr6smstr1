@@ -1,65 +1,215 @@
-import Link from "next/link";
+"use client";
 
-export default function HomePage() {
-    return (
-        <div
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                padding: "60px 20px",
-            }}
-        >
-            {/* Container utama */}
-            <div
-                style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "50px",
-                    alignItems: "center",
-                    maxWidth: "1100px",
-                    width: "100%",
-                    background: "#fff",
-                    padding: "40px",
-                    borderRadius: "20px",
-                    boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
-                }}
-            >
-                {/* Illustration */}
-                <div>
-                    <img
-                        src="https://akcdn.detik.net.id/community/media/visual/2021/02/26/hobi-membaca-buku-foto-freepikcom.jpeg?w=620&q=90"
-                        width={250}
-                        alt="Software Engineering Illustration"
-                        style={{
-                            border: "2px solid #eee",
-                            background: "white",
-                            padding: "15px",
-                            borderRadius: "12px",
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                        }}
-                    />
+import { useState } from "react";
+
+export default function Page() {
+    // Data buku dengan progres membaca
+    const books = [
+        {
+            id: 1,
+            title: "The Great Gatsby",
+            author: "F. Scott Fitzgerald",
+            cover: "https://m.media-amazon.com/images/I/81af+MCATTL.jpg",
+            progress: 40,
+        },
+        {
+            id: 2,
+            title: "Senja Di Jakarta",
+            author: "Mochtar Lubis",
+            cover: "https://down-id.img.susercontent.com/file/20c52ee3d6de607646749c875b7757b5",
+            progress: 75,
+        },
+        {
+            id: 3,
+            title: "1984",
+            author: "George Orwell",
+            cover: "https://m.media-amazon.com/images/I/71kxa1-0mfL.jpg",
+            progress: 20,
+        },
+    ];
+
+    // State untuk daftar buku yang disimpan
+    const [savedBooks, setSavedBooks] = useState<number[]>([]);
+
+    // Ganti fungsi addBook dengan toggleBook
+    const toggleBook = (id: number) => {
+        if (savedBooks.includes(id)) {
+            // hapus buku dari daftar
+            setSavedBooks(savedBooks.filter((bookId) => bookId !== id));
+        } else {
+            // tambahkan buku ke daftar
+            setSavedBooks([...savedBooks, id]);
+        }
+    };
+
+    // Component buku
+    const BookItem = (props: { id: number; title: string; author: string; cover: string; progress: number }) => {
+        const isSaved = savedBooks.includes(props.id);
+
+        return (
+            <div className="book-item">
+                <img src={props.cover} alt={props.title} className="book-cover" />
+
+                <div className="book-info">
+                    <h3 className="book-title">{props.title}</h3>
+                    <p className="book-author">{props.author}</p>
+
+                    {/* Progress membaca */}
+                    <div className="progress-container">
+                        <div className="progress-bar" style={{ width: `${props.progress}%` }}></div>
+                    </div>
+                    <p className="progress-text">{props.progress}% dibaca</p>
                 </div>
 
-                {/* Description */}
-                <div style={{ maxWidth: "600px" }}>
-                    <h1 style={{ margin: 0, fontSize: "36px", fontWeight: "800", color: "#000" }}>DIGITAL LIBRARY</h1>
-
-                    <p style={{ color: "#555", lineHeight: "1.7", fontSize: "17px" }}>
-                        Software Engineering (Rekayasa Perangkat Lunak) di SMK Telkom Malang
-                        adalah jurusan yang mempelajari pembuatan aplikasi berbasis teknologi.
-                        Siswa mempelajari pemrograman, UI/UX, basis data, dan pengembangan
-                        aplikasi modern sesuai kebutuhan industri.
-                    </p>
-
-                    <p style={{ color: "#555", lineHeight: "1.7", fontSize: "17px" }}>
-                        Pembelajaran berbasis proyek (Project Based Learning) membantu siswa
-                        memahami cara kerja programmer profesional sehingga siap menghadapi
-                        dunia kerja maupun melanjutkan pendidikan ke jenjang lebih tinggi.
-                    </p>
-
-                    <h3 style={{ marginTop: "20px", color: "#c00" }}>SMK Telkom Malang</h3>
-                </div>
+                <button
+                    className={`btn-plus ${isSaved ? "saved" : ""}`}
+                    aria-label="Toggle Book"
+                    onClick={() => toggleBook(props.id)}
+                >
+                    {isSaved ? "✓" : "+"}
+                </button>
             </div>
+        );
+    };
+
+    return (
+        <div className="container">
+            <h2 className="title">Daftar Buku</h2>
+
+            {books.map((b) => (
+                <BookItem
+                    key={b.id}
+                    id={b.id}
+                    title={b.title}
+                    author={b.author}
+                    cover={b.cover}
+                    progress={b.progress}
+                />
+            ))}
+
+            <style>{`
+        .container {
+          max-width: 500px;
+          margin: auto;
+          padding: 16px;
+        }
+
+        .title {
+          text-align: center;
+          font-size: 22px;
+          margin-bottom: 20px;
+        }
+
+        .book-item {
+          display: flex;
+          align-items: center;
+          border: 1px solid #ddd;
+          background: #fff;
+          padding: 12px;
+          border-radius: 10px;
+          margin-bottom: 15px;
+          box-shadow: 0px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .book-cover {
+          width: 60px;
+          height: 90px;
+          border-radius: 6px;
+          object-fit: cover;
+          margin-right: 12px;
+        }
+
+        .book-info {
+          flex: 1;
+        }
+
+        .book-title {
+          margin: 0;
+          font-size: 16px;
+          font-weight: bold;
+          color: #000;
+        }
+
+        .book-author {
+          color: #666;
+          margin: 4px 0;
+          font-size: 14px;
+        }
+
+        .progress-container {
+          background: #eee;
+          border-radius: 6px;
+          height: 8px;
+          width: 100%;
+          margin: 6px 0;
+        }
+
+        .progress-bar {
+          height: 100%;
+          background: #1976d2;
+          border-radius: 6px;
+        }
+
+        .progress-text {
+          font-size: 12px;
+          color: #333;
+        }
+
+        .btn-plus {
+          background: #d32f2f;
+          color: white;
+          border: none;
+          padding: 8px 12px;
+          border-radius: 50%;
+          font-size: 18px;
+          cursor: pointer;
+        }
+
+        .btn-plus:hover:not(:disabled) {
+          background: #b71c1c;
+        }
+
+        .btn-plus.saved {
+          background: #4caf50;
+        }
+
+        .saved-section {
+          margin-top: 20px;
+          padding: 12px;
+          border: 1px solid #ddd;
+          border-radius: 10px;
+          background: #f9f9f9;
+        }
+
+        /* Responsif hp */
+        @media (max-width: 480px) {
+          .book-item {
+            padding: 10px;
+          }
+
+          .book-cover {
+            width: 50px;
+            height: 75px;
+          }
+
+          .book-title {
+            font-size: 14px;
+          }
+
+          .book-author {
+            font-size: 13px;
+          }
+
+          .progress-text {
+            font-size: 11px;
+          }
+
+          .btn-plus {
+            padding: 6px 10px;
+            font-size: 16px;
+          }
+        }
+      `}</style>
         </div>
     );
 }
